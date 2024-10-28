@@ -1,4 +1,4 @@
-namespace SequenceParsers;
+namespace MaplePie;
 
 
 public struct Needed
@@ -38,7 +38,7 @@ public struct Needed
         return new Needed(count);
     }
 
-    public static readonly Needed Unknown = new Needed(-1);
+    public static readonly Needed Unknown = new Needed(0);
 
     public override string ToString()
     {

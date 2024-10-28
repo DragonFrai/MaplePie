@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequenceParsers", "SequenceParsers\SequenceParsers.csproj", "{C6775CCB-3000-4871-BD9E-78AD53C3FFFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaplePie", "MaplePie\MaplePie.csproj", "{C6775CCB-3000-4871-BD9E-78AD53C3FFFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequenceParsers.Tests", "SequenceParsers.Tests\SequenceParsers.Tests.csproj", "{A38B8137-69BF-4524-84CF-CD2E68802B12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaplePie.Tests", "MaplePie.Tests\MaplePie.Tests.csproj", "{A38B8137-69BF-4524-84CF-CD2E68802B12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

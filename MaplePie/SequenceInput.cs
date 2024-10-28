@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace SequenceParsers;
+namespace MaplePie;
 
 public readonly struct SequenceInput<TToken>
 {

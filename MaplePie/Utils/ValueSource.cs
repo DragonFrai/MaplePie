@@ -1,4 +1,4 @@
-namespace SequenceParsers.Utils;
+namespace MaplePie.Utils;
 
 
 public struct ValueSource<T>

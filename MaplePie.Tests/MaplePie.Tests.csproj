@@ -7,7 +7,7 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <RootNamespace>SequenceParse.Tests</RootNamespace>
+        <RootNamespace>MaplePie.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SequenceParsers\SequenceParsers.csproj" />
+      <ProjectReference Include="..\MaplePie\MaplePie.csproj" />
     </ItemGroup>
 
 </Project>
