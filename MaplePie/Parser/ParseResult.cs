@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace MaplePie;
+namespace MaplePie.Parser;
 
 
 public enum ParseResultKind
@@ -15,35 +15,34 @@ public enum ParseResultKind
     Fail,
 }
 
-
 public struct ParseResult<TToken, TOutput, TError>
 {
     private ParseResultKind _kind;
-    private InputRange _remainderRange;
+    private int _position;
     private TOutput _output;
     private TError _error;
 
-    private ParseResult(ParseResultKind kind, InputRange remainderRange, TOutput output, TError error)
+    private ParseResult(ParseResultKind kind, int position, TOutput output, TError error)
     {
         _kind = kind;
-        _remainderRange = remainderRange;
+        _position = position;
         _output = output;
         _error = error;
     }
 
-    public static ParseResult<TToken, TOutput, TError> Ok(InputRange range, TOutput output)
+    public static ParseResult<TToken, TOutput, TError> Ok(int position, TOutput output)
     {
-        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Ok, range, output, default!);
+        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Ok, position, output, default!);
     }
 
-    public static ParseResult<TToken, TOutput, TError> Miss(InputRange range, TError error)
+    public static ParseResult<TToken, TOutput, TError> Miss(int position, TError error)
     {
-        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Miss, range, default!, error);
+        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Miss, position, default!, error);
     }
     
-    public static ParseResult<TToken, TOutput, TError> Fail(InputRange range, TError error)
+    public static ParseResult<TToken, TOutput, TError> Fail(int position, TError error)
     {
-        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Fail, range, default!, error);
+        return new ParseResult<TToken, TOutput, TError>(ParseResultKind.Fail, position, default!, error);
     }
 
     public ParseResultKind Kind => _kind;
@@ -55,29 +54,32 @@ public struct ParseResult<TToken, TOutput, TError>
     {
         return Kind switch
         {
-            ParseResultKind.Miss => ParseResult<TToken, TOutputX, TError>.Miss(RemainderRange, Error),
-            ParseResultKind.Fail => ParseResult<TToken, TOutputX, TError>.Fail(RemainderRange, Error),
+            ParseResultKind.Miss => ParseResult<TToken, TOutputX, TError>.Miss(Position, Error),
+            ParseResultKind.Fail => ParseResult<TToken, TOutputX, TError>.Fail(Position, Error),
             ParseResultKind.Ok => throw new InvalidOperationException($"{nameof(Anything)} called for not error result."),
             _ => throw new UnreachableException()
         };
     }
     
     /// <summary>
-    /// 
+    /// Not parsed state for executed parser.
+    /// Used for passing in next parser in Ok case,
+    /// and for approx error location in Miss and Fail cases.
+    /// In Miss and Fail cases should be filled last known input reminder or empty range,
+    /// but it must always be valid input sequence range (no out of range of input).
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-    public InputRange RemainderRange
+    public int Position
     {
         get
         {
-            if (_kind != ParseResultKind.Ok && 
-                _kind != ParseResultKind.Miss && 
-                _kind != ParseResultKind.Fail)
+            if (_kind != ParseResultKind.Ok && _kind != ParseResultKind.Miss && _kind != ParseResultKind.Fail)
             {
-                throw new InvalidOperationException("Get remains from not expected result case");
+                throw new UnreachableException();
+                // throw new InvalidOperationException("Get remainder from not expected result case");
             }
 
-            return _remainderRange;
+            return _position;
         }
     }
     
@@ -109,7 +111,7 @@ public struct ParseResult<TToken, TOutput, TError>
 
     public ReadOnlySpan<TToken> Remainder(ReadOnlySpan<TToken> input)
     {
-        return input.Slice(RemainderRange.CursorRange);
+        return input.Slice(Position);
     }
 
     public override string ToString()
@@ -119,6 +121,20 @@ public struct ParseResult<TToken, TOutput, TError>
             ParseResultKind.Ok => $"{nameof(ParseResultKind.Ok)}({Output?.ToString()})",
             ParseResultKind.Miss => $"{nameof(ParseResultKind.Miss)}({Error?.ToString()})",
             ParseResultKind.Fail => $"{nameof(ParseResultKind.Fail)}({Error?.ToString()})",
+            _ => throw new UnreachableException()
+        };
+    }
+    
+    public string ToString(ReadOnlySpan<TToken> input)
+    {
+        var position = Position;
+        var limitedLength = Math.Min(input.Length - position, 16);
+        var reminder = input.Slice(position, limitedLength);
+        return Kind switch
+        {
+            ParseResultKind.Ok => $"{nameof(ParseResultKind.Ok)}({Output?.ToString()}, rem='{reminder.ToString()}')",
+            ParseResultKind.Miss => $"{nameof(ParseResultKind.Miss)}({Error?.ToString()}, rem='{reminder.ToString()}')",
+            ParseResultKind.Fail => $"{nameof(ParseResultKind.Fail)}({Error?.ToString()}, rem='{reminder.ToString()}')",
             _ => throw new UnreachableException()
         };
     }
@@ -132,7 +148,7 @@ public static class ResultExtensions
             this ParseResult<TToken, InputRange, TError> result,
             ReadOnlySpan<TToken> input)
     {
-        return input.Slice(result.Output.CursorRange);
+        return input.Slice(result.Output.Position, result.Output.Length);
     }
     
     // public static ParseResult<TToken, TOutVal2, TError> Map<TToken, TOutVal1, TOutVal2, TError>(

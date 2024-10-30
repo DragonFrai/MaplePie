@@ -1,15 +1,10 @@
-using System.Buffers;
-using MaplePie.Utils;
+using MaplePie.Errors;
+using MaplePie.Parser;
 
 namespace MaplePie.BaseParsers;
 
-public readonly struct TakeError(int expected, int actual)
-{
-    public int Expected => expected;
-    public int Actual => actual;
-}
-
-public struct TakeParser<TToken> : IParser<TakeParser<TToken>, TToken, InputRange, TakeError>
+public struct TakeParser<TToken> 
+    : IParser<TakeParser<TToken>, TToken, InputRange, ParseError>
 {
     private int _count;
 
@@ -18,17 +13,18 @@ public struct TakeParser<TToken> : IParser<TakeParser<TToken>, TToken, InputRang
         _count = count;
     }
 
-    public static ParseResult<TToken, InputRange, TakeError> Parse(ref TakeParser<TToken> self, ReadOnlySpan<TToken> input, InputRange range)
+    public static ParseResult<TToken, InputRange, ParseError> Parse(ref TakeParser<TToken> self,
+        ReadOnlySpan<TToken> input, int position)
     {
-        var inputLen = range.Length;
+        var inputLen = input.Length - position;
+        var takeCount = self._count;
 
-        if (inputLen < self._count)
+        if (inputLen < takeCount)
         {
-            return ParseResult<TToken, InputRange, TakeError>.Miss(range, new TakeError(self._count, inputLen));
+            return ParseResult<TToken, InputRange, ParseError>.Miss(position, ParseError.Take);
         }
 
-        range.Split(self._count, out var result, out var remains);
-
-        return ParseResult<TToken, InputRange, TakeError>.Ok(remains, result);
+        var takeRange = new InputRange(position, takeCount);
+        return ParseResult<TToken, InputRange, ParseError>.Ok(position + takeCount, takeRange);
     }
 }

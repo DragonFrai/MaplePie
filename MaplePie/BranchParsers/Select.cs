@@ -1,8 +1,67 @@
-using System.Buffers;
 using System.Diagnostics;
+using MaplePie.Parser;
 using MaplePie.Utils;
 
-namespace MaplePie.Branches;
+namespace MaplePie.BranchParsers;
+
+
+public struct Select2Parser<TParser1, TParser2, TToken, TOutput, TError> 
+    : IParser<Select2Parser<TParser1, TParser2, TToken, TOutput, TError>, TToken, TOutput, TError>
+    where TParser1: IParser<TParser1, TToken, TOutput, TError>
+    where TParser2: IParser<TParser2, TToken, TOutput, TError>
+{
+    private TParser1 _parser1;
+    private TParser2 _parser2;
+    private ValueSource<TError> _notSelectedError;
+
+    public Select2Parser(TParser1 parser1, TParser2 parser2, ValueSource<TError> notSelectedError)
+    {
+        _parser1 = parser1;
+        _parser2 = parser2;
+        _notSelectedError = notSelectedError;
+    }
+    
+    public static
+        ParseResult<TToken, TOutput, TError> Parse(ref Select2Parser<TParser1, TParser2, TToken, TOutput, TError> self,
+            ReadOnlySpan<TToken> input,
+            int range)
+    {
+        var result1 = TParser1.Parse(ref self._parser1, input, range);
+        switch (result1.Kind)
+        {
+            case ParseResultKind.Ok: 
+                return ParseResult<TToken, TOutput, TError>.Ok(result1.Position, result1.Output);
+            case ParseResultKind.Fail:
+                return 
+                    ParseResult<TToken, TOutput, TError>.Fail
+                    (
+                        result1.Position, 
+                        result1.Error
+                    );
+            case ParseResultKind.Miss: break;
+            default: throw new UnreachableException();
+        }
+
+        var result2 = TParser2.Parse(ref self._parser2, input, range);
+        switch (result2.Kind)
+        {
+            case ParseResultKind.Ok: 
+                return ParseResult<TToken, TOutput, TError>.Ok(result2.Position, result2.Output);
+            case ParseResultKind.Fail:
+                return 
+                    ParseResult<TToken, TOutput, TError>.Fail
+                    (
+                        result2.Position, 
+                        result2.Error
+                    );
+            case ParseResultKind.Miss: break;
+            default: throw new UnreachableException();
+        }
+
+        return ParseResult<TToken, TOutput, TError>.Miss(range, self._notSelectedError.Get());
+    }
+}
+
 
 //
 // public class AnyBoxedParser<TToken, TOutVal, TError> : IBoxedParser<TToken, TOutVal, TError>
