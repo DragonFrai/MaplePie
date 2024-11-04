@@ -49,6 +49,7 @@ public struct ParseResult<TToken, TOutput, TError>
     public bool IsOk => _kind == ParseResultKind.Ok;
     public bool IsMiss => _kind == ParseResultKind.Miss;
     public bool IsFail => _kind == ParseResultKind.Fail;
+    public bool IsError => IsMiss || IsFail;
 
     public ParseResult<TToken, TOutputX, TError> Anything<TOutputX>()
     {
@@ -127,14 +128,18 @@ public struct ParseResult<TToken, TOutput, TError>
     
     public string ToString(ReadOnlySpan<TToken> input)
     {
+        const int lengthLimit = 16;
+        
         var position = Position;
-        var limitedLength = Math.Min(input.Length - position, 16);
+        var limitedLength = Math.Min(input.Length - position, lengthLimit);
         var reminder = input.Slice(position, limitedLength);
+        var reminderPost = (input.Length - Position) > lengthLimit ? "..." : "";
+        
         return Kind switch
         {
-            ParseResultKind.Ok => $"{nameof(ParseResultKind.Ok)}({Output?.ToString()}, rem='{reminder.ToString()}')",
-            ParseResultKind.Miss => $"{nameof(ParseResultKind.Miss)}({Error?.ToString()}, rem='{reminder.ToString()}')",
-            ParseResultKind.Fail => $"{nameof(ParseResultKind.Fail)}({Error?.ToString()}, rem='{reminder.ToString()}')",
+            ParseResultKind.Ok => $"{nameof(ParseResultKind.Ok)}({Output?.ToString()}, rem='{reminder.ToString()}{reminderPost}')",
+            ParseResultKind.Miss => $"{nameof(ParseResultKind.Miss)}({Error?.ToString()}, rem='{reminder.ToString()}{reminderPost}')",
+            ParseResultKind.Fail => $"{nameof(ParseResultKind.Fail)}({Error?.ToString()}, rem='{reminder.ToString()}{reminderPost}')",
             _ => throw new UnreachableException()
         };
     }

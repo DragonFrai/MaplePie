@@ -36,29 +36,6 @@ public class BoxedParserImpl<TParser, TToken, TOutput, TError>(TParser parser):
     }
 }
 
-//
-// public struct BoxedParserRef<TToken, TOutVal, TError>: IParser<BoxedParserRef<TToken, TOutVal, TError>, TToken, TOutVal, TError>
-// {
-//     private IBoxedParser<TToken, TOutVal, TError> _boxedParser;
-//
-//     public BoxedParserRef(IBoxedParser<TToken, TOutVal, TError> boxedParser)
-//     {
-//         _boxedParser = boxedParser;
-//     }
-//
-//     public IBoxedParser<TToken, TOutVal, TError> Inner => _boxedParser;
-//     
-//     public static ParseResult<TToken, TOutVal, TError> Parse(ref BoxedParserRef<TToken, TOutVal, TError> self, SequenceInput<TToken> input)
-//     {
-//         return self._boxedParser.Parse(input);
-//     }
-//
-//     public static void Reset(ref BoxedParserRef<TToken, TOutVal, TError> self)
-//     {
-//         self._boxedParser.Reset();
-//     }
-// }
-
 public static class FundamentalBoxedParserExtensions
 {
     public static 

@@ -1,6 +1,7 @@
 using System.Text;
-using MaplePie.CombineParsers;
+using MaplePie.Parsers.Combine;
 using MaplePie.Parser;
+using MaplePie.Utils;
 
 namespace MaplePie.Errors;
 
@@ -11,7 +12,7 @@ public class ContextError
 
     public ContextError(string context)
     {
-        var contexts = new Stack<string>(4);
+        var contexts = new Stack<string>();
         contexts.Push(context);
         _contexts = contexts;
     }
@@ -62,6 +63,17 @@ public class ContextError
 public static class ParserContextErrorExtensions
 {
     public static
+        Parser<MapErrorParser<TParser, TToken, TOutput, Unit, ContextError>, TToken, TOutput, ContextError>
+        Context<TParser, TToken, TOutput>
+        (
+            this Parser<TParser, TToken, TOutput, Unit> parser, string context
+        )
+        where TParser : IParser<TParser, TToken, TOutput, Unit>
+    {
+        return parser.MapError(_ => new ContextError(context));
+    }
+    
+    public static
         Parser<MapErrorParser<TParser, TToken, TOutput, TError, ContextError>, TToken, TOutput, ContextError>
         SetContext<TParser, TToken, TOutput, TError>
         (
@@ -85,14 +97,14 @@ public static class ParserContextErrorExtensions
         return parser.MapError(ce => ce.AddContext(context));
     }
 
-    public static
-        Parser<MapErrorParser<TParser, TToken, TOutput, ParseError, ContextError>, TToken, TOutput, ContextError>
-        ToContextual<TParser, TToken, TOutput>
-        (
-            this Parser<TParser, TToken, TOutput, ParseError> parser
-        )
-        where TParser : IParser<TParser, TToken, TOutput, ParseError>
-    {
-        return parser.MapError(pe => new ContextError(pe.ToString()));
-    }
+    // public static
+    //     Parser<MapErrorParser<TParser, TToken, TOutput, Unit, ContextError>, TToken, TOutput, ContextError>
+    //     ToContextual<TParser, TToken, TOutput>
+    //     (
+    //         this Parser<TParser, TToken, TOutput, Unit> parser
+    //     )
+    //     where TParser : IParser<TParser, TToken, TOutput, Unit>
+    // {
+    //     return parser.MapError(pe => new ContextError(pe.ToString()));
+    // }
 }

@@ -21,10 +21,7 @@ public static class FuncParser
     {
         return new Parser<FuncParser<TToken, TOutVal, TError>, TToken, TOutVal, TError>(new FuncParser<TToken, TOutVal, TError>(func));
     }
-}
-
-public static class ParseFuncExtensions
-{
+    
     public static Parser<FuncParser<TToken, TOutVal, TError>, TToken, TOutVal, TError>
         ToParser<TToken, TOutVal, TError>(this ParseFunc<TToken, TOutVal, TError> func)
     {
