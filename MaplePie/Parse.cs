@@ -5,8 +5,8 @@ using MaplePie.Parsers.Combine;
 using MaplePie.Parsers.Multi;
 using MaplePie.Parsers.Sequence;
 using MaplePie.Parsers.Token;
+using MaplePie.Parsers.Zero;
 using MaplePie.Utils;
-using MaplePie.ZeroParsers;
 
 namespace MaplePie;
 
@@ -360,6 +360,30 @@ public static class Parse
     {
         return new Parser<ConsumedParser<TParser, TToken, TOutput, TError>, TToken, InputRange, TError>(
             new ConsumedParser<TParser, TToken, TOutput, TError>(parser.Inner)
+        );
+    }
+    
+    public static
+        Parser<OptionalParser<TParser, NullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>, TToken, TOutput?, TError>
+        Opt<TParser, TToken, TOutput, TError>(
+            Parser<TParser, TToken, TOutput, TError> parser)
+        where TParser : IParser<TParser, TToken, TOutput, TError>
+        where TOutput : class
+    {
+        return new Parser<OptionalParser<TParser, NullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>, TToken, TOutput?, TError>(
+            new OptionalParser<TParser, NullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>(parser.Inner)
+        );
+    }
+    
+    public static
+        Parser<OptionalParser<TParser, ValueNullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>, TToken, TOutput?, TError>
+        ValueOpt<TParser, TToken, TOutput, TError>(
+            Parser<TParser, TToken, TOutput, TError> parser)
+        where TParser : IParser<TParser, TToken, TOutput, TError>
+        where TOutput : struct
+    {
+        return new Parser<OptionalParser<TParser, ValueNullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>, TToken, TOutput?, TError>(
+            new OptionalParser<TParser, ValueNullableOptionProxy<TOutput>, TToken, TOutput, TOutput?, TError>(parser.Inner)
         );
     }
     

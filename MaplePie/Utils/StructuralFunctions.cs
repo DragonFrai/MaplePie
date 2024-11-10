@@ -1,4 +1,4 @@
-namespace MaplePie.Stuff;
+namespace MaplePie.Utils;
 
 
 public interface IStructFunc<TF, in TA, out TR>

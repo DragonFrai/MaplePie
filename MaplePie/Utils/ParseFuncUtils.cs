@@ -1,3 +1,5 @@
+using MaplePie.Parser;
+
 namespace MaplePie.Utils;
 
 public static class ParseFuncUtils
@@ -91,6 +93,21 @@ public static class ParseFuncUtils
     }
 
 
+
+    // public static void ParseOptional<TParser, TToken, TOutput, TError>(ref TParser parser, ReadOnlySpan<TToken> input, int position) 
+    // where TParser : IParser<TParser, TToken, TOutput, TError>
+    // {
+    //     var result = TParser.Parse(ref parser, input, position);
+    //
+    //     
+    //     switch (result.Kind)
+    //     {
+    //         case ParseResultKind.Ok:
+    //             
+    //     }
+    //
+    //
+    // }
     
     
 }

@@ -1,6 +1,6 @@
 using MaplePie.Parser;
 
-namespace MaplePie.ZeroParsers;
+namespace MaplePie.Parsers.Zero;
 
 
 public readonly struct FailParser<TToken, TOutput, TError>(TError error) : IParser<FailParser<TToken, TOutput, TError>, TToken, TOutput, TError>

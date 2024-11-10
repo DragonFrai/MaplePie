@@ -138,7 +138,7 @@ public class JsonExample
                 )
                 .MapS(span => span.ToString())
                 .SetContext("string");
-
+        
         var arrayParser =
             Parse.Between(
                 Parse.SkipEq('[').SetContext("open"),

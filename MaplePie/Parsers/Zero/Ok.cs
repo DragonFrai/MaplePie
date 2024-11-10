@@ -1,6 +1,6 @@
 using MaplePie.Parser;
 
-namespace MaplePie.ZeroParsers;
+namespace MaplePie.Parsers.Zero;
 
 
 public readonly struct OkParser<TToken, TOutput, TError>(TOutput output) : IParser<OkParser<TToken, TOutput, TError>, TToken, TOutput, TError>
